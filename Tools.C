@@ -43,7 +43,14 @@
 */
 uint64_t Tools::buildLong(uint8_t bytes[LONGSIZE])
 {
-  return 0;
+	uint64_t ans = 0;
+	int byte_size = 8;
+	for (int i = 7; i >= 0; --i)
+	{
+		ans = ans << byte_size;
+		ans += bytes[i];
+	}
+	return ans;
 }
 
 /** 
@@ -67,7 +74,13 @@ uint64_t Tools::buildLong(uint8_t bytes[LONGSIZE])
 */
 uint64_t Tools::getByte(uint64_t source, int32_t byteNum)
 {
-  return 0;
+	uint64_t mask = 0x00000000000000ff;
+	if (byteNum >= 8 || byteNum < 0) {
+		return 0;
+	}
+	int32_t right_bit_shift = byteNum * 8;
+	uint64_t ans = source >> right_bit_shift;
+	return ans & mask;
 }
 
 /**
@@ -97,7 +110,15 @@ uint64_t Tools::getByte(uint64_t source, int32_t byteNum)
  */
 uint64_t Tools::getBits(uint64_t source, int32_t low, int32_t high)
 {
-  return 0;
+	if ((low < 0 || low > 63) || (high < 0 || high > 63)) {
+		//printf("0 no\n");
+		return 0;
+	}
+	uint64_t ans = source >> low;
+	ans = ans << (high - 63);
+	ans = ans >> (high - 63);
+	//printf("%lx\n", ans);
+	return 0;
 }
 
 
@@ -125,7 +146,7 @@ uint64_t Tools::getBits(uint64_t source, int32_t low, int32_t high)
  */
 uint64_t Tools::setBits(uint64_t source, int32_t low, int32_t high)
 {
-  return 0;
+	return 0;	
 }
 
 /**
