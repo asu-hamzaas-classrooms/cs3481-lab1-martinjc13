@@ -111,14 +111,11 @@ uint64_t Tools::getByte(uint64_t source, int32_t byteNum)
 uint64_t Tools::getBits(uint64_t source, int32_t low, int32_t high)
 {
 	if ((low < 0 || low > 63) || (high < 0 || high > 63)) {
-		//printf("0 no\n");
 		return 0;
 	}
-	uint64_t ans = source >> low;
-	ans = ans << (high - 63);
-	ans = ans >> (high - 63);
-	//printf("%lx\n", ans);
-	return 0;
+	uint64_t mask = 0xffffffffffffffff;
+	mask = (mask >> (63 - high)) & (mask << low);
+	return (source & mask) >> low;
 }
 
 
@@ -146,7 +143,14 @@ uint64_t Tools::getBits(uint64_t source, int32_t low, int32_t high)
  */
 uint64_t Tools::setBits(uint64_t source, int32_t low, int32_t high)
 {
-	return 0;	
+	if ((low > 63 || low < 0) || (high > 63 || high < 0)) {
+		return source;
+	}
+	uint64_t mask = 0xffffffffffffffff;
+	mask = (mask >> (63 - high)) & (mask << low);
+	mask = mask >> low;
+	mask = mask << low;
+	return mask | source;
 }
 
 /**
@@ -171,9 +175,16 @@ uint64_t Tools::setBits(uint64_t source, int32_t low, int32_t high)
  */
 uint64_t Tools::clearBits(uint64_t source, int32_t low, int32_t high)
 {
-  return 0;
+	if ((low > 63 || low < 0) || (high > 63 || high < 0)) {
+		return source;
+	}
+	uint64_t mask = 0xffffffffffffffff;
+	mask = (mask >> (63 - high)) & (mask << low);
+	mask = mask >> low;
+	mask = mask << low;
+	mask = ~mask;
+	return mask & source;
 }
-
 
 /**
  * copies length bits from the source to a destination and returns the
@@ -249,7 +260,8 @@ uint64_t Tools::setByte(uint64_t source, int32_t byteNum)
  */
 uint64_t Tools::sign(uint64_t source)
 {
-  return 0;
+	uint64_t ans = Tools::getBits(source, 63, 63);
+ 	return ans;
 }
 
 /**
@@ -279,7 +291,8 @@ bool Tools::addOverflow(uint64_t op1, uint64_t op2)
   //      Thus, the way to check for an overflow is to compare the signs of the
   //      operand and the result.  For example, if you add two positive numbers, 
   //      the result should be positive, otherwise an overflow occurred.
-  return false;
+	
+  	return false;
 }
 
 /**
