@@ -213,7 +213,17 @@ uint64_t Tools::clearBits(uint64_t source, int32_t low, int32_t high)
 uint64_t Tools::copyBits(uint64_t source, uint64_t dest, 
                          int32_t srclow, int32_t dstlow, int32_t length)
 {
-   return 0; 
+	if (srclow < 0 || dstlow < 0 || length < 0 || srclow + length > 64 || dstlow + length > 64) {
+		return dest;
+	}
+	uint64_t src = Tools::getBits(source, srclow, srclow + length - 1);
+	uint64_t destination = Tools::clearBits(dest, dstlow, dstlow + length -1);
+	destination = destination >> dstlow;
+	destination += src;
+	destination = destination << dstlow;
+	uint64_t cleared = Tools::clearBits(dest, dstlow, 63);
+	destination += cleared;
+	return destination;
 }
 
 
@@ -238,7 +248,10 @@ uint64_t Tools::copyBits(uint64_t source, uint64_t dest,
  */
 uint64_t Tools::setByte(uint64_t source, int32_t byteNum)
 {
-  return 0;
+ 	int byte_size = 8;
+	uint64_t mask = 0x00000000000000ff;
+	mask = mask << ((byteNum) * byte_size);
+	return source | (mask * (uint64_t)(byteNum <= 7 && byteNum >= 0));
 }
 
 
@@ -291,7 +304,11 @@ bool Tools::addOverflow(uint64_t op1, uint64_t op2)
   //      Thus, the way to check for an overflow is to compare the signs of the
   //      operand and the result.  For example, if you add two positive numbers, 
   //      the result should be positive, otherwise an overflow occurred.
-	
+	uint64_t operand1 = Tools::sign(op1);
+	uint64_t operand2 = Tools::sign(op2);
+	uint64_t result = Tools::sign(op1 + op2);
+	if ((operand1 == operand2) && operand1 != result)
+		return true;	
   	return false;
 }
 
@@ -321,5 +338,10 @@ bool Tools::subOverflow(uint64_t op1, uint64_t op2)
   //Note: you can not simply use addOverflow in this function.  If you negate
   //op1 in order to an add, you may get an overflow. 
   //NOTE: the subtraction is op2 - op1 (not op1 - op2).
-  return false;
+  	uint64_t operand1 = Tools::sign(op1);
+	uint64_t operand2 = Tools::sign(op2);
+	uint64_t result = Tools::sign(op2 - op1);
+	if ((operand2 != operand1) && (operand2 != result))
+		return true;
+	return false;
 }

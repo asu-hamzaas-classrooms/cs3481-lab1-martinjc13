@@ -232,7 +232,10 @@ int buildLongTests()
    pass &= myAssert(Tools::buildLong(bytes6), 0xffffffff00000000);
 
    uint8_t bytes7[LONGSIZE] = {0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00};
-   pass &= myAssert(Tools::buildLong(bytes7), 0x00000000ffffffff); 
+   pass &= myAssert(Tools::buildLong(bytes7), 0x00000000ffffffff);
+
+   uint8_t bytes8[LONGSIZE] = {0x11, 0x33, 0x66, 0x88, 0x00, 0x00, 0x11, 0x00};
+   pass &= myAssert(Tools::buildLong(bytes8), 0x0011000088663311);
    
    return pass;
 }
@@ -374,6 +377,7 @@ int signTests()
    pass &= myAssert(Tools::sign(0x0000000000000000), 0);
    pass &= myAssert(Tools::sign(0x1111111111111111), 0);
    pass &= myAssert(Tools::sign(0xffffffffffffffff), 1);
+   pass &= myAssert(Tools::sign(0x8000100010000001), 1);
    return pass;
 }
 
